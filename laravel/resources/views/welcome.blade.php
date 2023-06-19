@@ -132,36 +132,73 @@
             </div>
             
         </section>
-        <script src="https://cdn.sumup.com/sumup.js"></script>
+        <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
         <script type="text/javascript">
 
-        // const apiUrl = 'https://api.sumup.com/v0.2/checkouts/8e429893-0e8b-4b76-ba04-2453c5828f3a';
-        const accessToken = 'sup_sk_0zsrkzKJcbO8tv0ZLGF3foCI9HDDM6DTw'
-        SumUp.init({
-            apikey: '',
-            accessToken: accessToken
-        });
+<div id="sumup-card"></div>
+<script
+  type="text/javascript"
+  src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"
+></script>
+<script type="text/javascript">
 
-        SumUp.createCheckout({
-            amount: Number("<?php echo $total_price ?>"),
-            currency: 'BRL',
-            title: 'My Product',
-            description: 'A description of my product'
-            }, function(result) {
-            console.log(result);
-            checkoutId = result.checkoutId;
-        });
+    const apiKey = 'sup_sk_V09RYlxy1or8ZfEsCmxvPC24QA3bYsALi';
+    const checkoutId = '';
 
-        SumUp.getCheckoutStatus(8e429893-0e8b-4b76-ba04-2453c5828f3a, function(result) {
-        if (result.status === 'PAID') {
-            console.log('Payment successful!');
-        } else if (result.status === 'FAILED') {
-            console.error('Payment failed: ' + result.reason);
-        } else if (result.status === 'PENDING') {
-            console.log('Payment is still pending.');
-        }
-        });
-        </script>
+    // Replace the following variables with your checkout data
+    const amount = Number("<?php echo $total_price?>");
+    const currency = 'BRL';
+    const description = 'Test payment';
+    console.log(amount);
+
+    // Set the API endpoint
+    const apiEndpoint = 'https://api.sumup.com/v0.1/me/checkouts';
+
+    // Set the request headers
+    const headers = {
+    Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    // Set the request body
+    const body = {
+    amount: {
+        value: amount,
+        currency: currency
+    },
+    description: description
+    };
+
+    // Send the checkout request
+    fetch(apiEndpoint, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        checkoutId = data.checkout_id;
+        console.log('Checkout ID:', checkoutId);
+    }).catch(function(error) {
+        console.error('Error creating checkout:', error);
+    });
+
+
+  SumUpCard.mount({
+    id: 'sumup-card',
+    checkoutId: checkoutId,
+    showSubmitButton: true,
+    extrnalSubmitEvent: false,
+    selectedPaymentMethod: "card",
+    showFooter: true,
+    currency: "BRL",
+    amount: Number("<?php echo $total_price ?>"),
+    onResponse: function (type, body) {
+      console.log('Type', type);
+      console.log('Body', body);
+    },
+  });
+</script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     </body>
