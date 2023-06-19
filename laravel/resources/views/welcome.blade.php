@@ -132,28 +132,35 @@
             </div>
             
         </section>
-        <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
+        <script src="https://cdn.sumup.com/sumup.js"></script>
         <script type="text/javascript">
-            var price = Number("<?php echo $total_price ?>");
-            SumUpCard.mount({
-                id: 'sumup-card',
-                checkoutId: 'demo',
-                showSubmitButton: true,
-                externalSubmiEvent: false,
-                selectedPaymentMethod: "card",
-                showFooter: true,
-                currency: "BRL",
-                sessionId: "FTz-MYijZOCrBVYhS48PC",
-                timestamp: "1686932148486",
-                amount: price,
-                onResponse: function (type, body) {
-                console.log('Type', type);
-                console.log('Body', body);
-                if(type == "success") {
-                    alert('payment is successful')
-                }
-                },
-            });
+
+        // const apiUrl = 'https://api.sumup.com/v0.2/checkouts/8e429893-0e8b-4b76-ba04-2453c5828f3a';
+        const accessToken = 'sup_sk_0zsrkzKJcbO8tv0ZLGF3foCI9HDDM6DTw'
+        SumUp.init({
+            apikey: '',
+            accessToken: accessToken
+        });
+
+        SumUp.createCheckout({
+            amount: Number("<?php echo $total_price ?>"),
+            currency: 'BRL',
+            title: 'My Product',
+            description: 'A description of my product'
+            }, function(result) {
+            console.log(result);
+            checkoutId = result.checkoutId;
+        });
+
+        SumUp.getCheckoutStatus(8e429893-0e8b-4b76-ba04-2453c5828f3a, function(result) {
+        if (result.status === 'PAID') {
+            console.log('Payment successful!');
+        } else if (result.status === 'FAILED') {
+            console.error('Payment failed: ' + result.reason);
+        } else if (result.status === 'PENDING') {
+            console.log('Payment is still pending.');
+        }
+        });
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
