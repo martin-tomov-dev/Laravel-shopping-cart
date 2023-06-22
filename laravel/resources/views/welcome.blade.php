@@ -135,70 +135,64 @@
         <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
         <script type="text/javascript">
 
-<div id="sumup-card"></div>
-<script
-  type="text/javascript"
-  src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"
-></script>
-<script type="text/javascript">
+        const apiKey = 'at_classic_fOA2gkJAsL0fuVV4vCS0L2lc9PczKFv9G1Fgw4X1U37GndrsP0yqc';
+        var checkoutId = '';
 
-    const apiKey = 'sup_sk_V09RYlxy1or8ZfEsCmxvPC24QA3bYsALi';
-    const checkoutId = '';
+        // Set the API endpoint
+        const apiEndpoint = 'https://api.sumup.com/v0.1/checkouts';
 
-    // Replace the following variables with your checkout data
-    const amount = Number("<?php echo $total_price?>");
-    const currency = 'BRL';
-    const description = 'Test payment';
-    console.log(amount);
+        // Set the request headers
+        const headers = {
+        Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        };
+        var amount = Number("<?php echo $total_price ?>");
 
-    // Set the API endpoint
-    const apiEndpoint = 'https://api.sumup.com/v0.1/me/checkouts';
+        // Set the request body
+        const body = {
+            checkout_reference: "CO1479C574595",
+            amount: 1,
+            currency: "BRL",
+            pay_to_email: "danilo@dcloud.com.br",
+            description: "link pagamento",
+            return_url: "https://www.freelancer.com/",
+            merchant_code:"MCE62ZGV"        
+        };
 
-    // Set the request headers
-    const headers = {
-    Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-    };
+        // Send the checkout request
+        
+        fetch(apiEndpoint, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body)
+        }).then(function(response) {
+            return response.json();
+        }).then((function(data) {
+            checkoutId = data.id;
+            console.log(data);
+            SumUpCard.mount({
+                id: 'sumup-card',
+                checkoutId: checkoutId,
+                showSubmitButton: true,
+                externalSubmitEvent: false,
+                selectedPaymentMethod: "Card",
+                currency: "BRL",
+                amount: 1,
+                onResponse: function (type, body) {
+                console.log('Type', type);
+                console.log('Body', body);
+                if(type == 'success') {
+                    window.location.href = 'https://www.freelancer.com/'
+                }
+                },
+            });
+            }))
 
-    // Set the request body
-    const body = {
-    amount: {
-        value: amount,
-        currency: currency
-    },
-    description: description
-    };
-
-    // Send the checkout request
-    fetch(apiEndpoint, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(body)
-    }).then(function(response) {
-        return response.json();
-    }).then(function(data) {
-        checkoutId = data.checkout_id;
-        console.log('Checkout ID:', checkoutId);
-    }).catch(function(error) {
-        console.error('Error creating checkout:', error);
-    });
+    
 
 
-  SumUpCard.mount({
-    id: 'sumup-card',
-    checkoutId: checkoutId,
-    showSubmitButton: true,
-    extrnalSubmitEvent: false,
-    selectedPaymentMethod: "card",
-    showFooter: true,
-    currency: "BRL",
-    amount: Number("<?php echo $total_price ?>"),
-    onResponse: function (type, body) {
-      console.log('Type', type);
-      console.log('Body', body);
-    },
-  });
-</script>
+
+        </script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     </body>
